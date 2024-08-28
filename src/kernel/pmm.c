@@ -62,13 +62,34 @@ void pmm_free_page(void* page_address) {
 }
 
 uint64_t pmm_get_free_memory() {
+    print("PMM: Calculating free memory...\n");
     uint64_t free_pages = 0;
     for (size_t i = 0; i < BITMAP_SIZE; i++) {
+        uint32_t bitmap_entry = memory_bitmap[i];
         for (int j = 0; j < 32; j++) {
-            if (!(memory_bitmap[i] & (1 << j))) {
+            if (!(bitmap_entry & (1 << j))) {
                 free_pages++;
             }
         }
+        if (i % 1000 == 0) {
+            print("Processed ");
+            print_hex(i);
+            print(" / ");
+            print_hex(BITMAP_SIZE);
+            print(" entries. Free pages so far: ");
+            print_hex(free_pages);
+            print("\n");
+            
+            // Return early for testing
+            if (i >= 5000) {
+                print("Early return for testing.\n");
+                return free_pages * PAGE_SIZE;
+            }
+        }
     }
+    print("\n");
+    print("PMM: Free pages: ");
+    print_hex(free_pages);
+    print("\n");
     return free_pages * PAGE_SIZE;
 }

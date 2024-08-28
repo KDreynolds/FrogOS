@@ -9,7 +9,11 @@ LDFLAGS = -nostdlib
 SRC_DIR = src
 BUILD_DIR = build
 
-SRCS = $(SRC_DIR)/boot/start.S $(SRC_DIR)/kernel/kernel.c $(SRC_DIR)/kernel/pmm.c
+SRCS = $(SRC_DIR)/boot/start.S \
+       $(SRC_DIR)/kernel/kernel.c \
+       $(SRC_DIR)/kernel/pmm.c \
+       $(SRC_DIR)/drivers/uart.c
+
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 OBJS := $(OBJS:$(SRC_DIR)/%.S=$(BUILD_DIR)/%.o)
 
