@@ -29,6 +29,9 @@ void uart_init() {
 
     // Enable UART0, receive & transfer part of UART
     *((volatile uint32_t*)(UART0_CR)) = 0x301;
+
+    // Debug output - write 'D' to UART
+    *((volatile uint32_t*)(UART0_DR)) = 'D';
 }
 
 void uart_putc(unsigned char c) {

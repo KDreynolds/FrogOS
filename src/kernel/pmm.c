@@ -81,16 +81,9 @@ uint64_t pmm_get_free_memory() {
             print(" / ");
             print_hex(BITMAP_SIZE);
             print(" bitmap entries\n");
-
-            // Early exit for debugging
-            if (total_iterations >= 5000) {
-                print("PMM: Early exit for debugging\n");
-                goto exit;
-            }
         }
     }
 
-exit:
     print("PMM: Free memory calculation complete\n");
     print("PMM: Free pages: ");
     print_hex(free_pages);

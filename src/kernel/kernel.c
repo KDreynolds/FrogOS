@@ -1,7 +1,9 @@
 #include <stdint.h>
 #include "kernel/pmm.h"
 #include "kernel/io.h"
+#include "kernel/shell.h"
 #include "kernel/uart.h"
+#include "kernel/fs.h"
 
 
 // Function to print a string
@@ -31,38 +33,51 @@ void kernel_main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3) {
     (void)x2;
     (void)x3;
 
-    uart_init();  // Initialize UART
+    *((volatile uint32_t*)(0x09000000)) = 'E';
 
-    print("Kernel started.\n");
+    print("1. UART initialization...\n");
+    uart_init();
+    print("UART initialized.\n");
+
+    print("2. Kernel started.\n");
 
     // For now, let's assume we have 128MB of RAM
     uint64_t mem_size = 128 * 1024 * 1024;
 
-    print("Initializing Physical Memory Manager...\n");
+    print("3. Initializing Physical Memory Manager...\n");
     pmm_init(mem_size);
 
-    print("PMM initialization complete.\n");
+    print("4. PMM initialization complete.\n");
     print("Total memory: ");
     print_hex(mem_size);
     print(" bytes\n");
 
-    print("Preparing to calculate free memory...\n");
+    print("5. Preparing to calculate free memory...\n");
     // Add a small delay here
     for (volatile int i = 0; i < 1000000; i++) {
         __asm__("nop");
     }
 
-    print("Calculating free memory...\n");
+    print("6. Calculating free memory...\n");
     uint64_t free_mem = pmm_get_free_memory();
 
-    print("Free memory calculation complete.\n");
+    print("7. Free memory calculation complete.\n");
     print("Free memory: ");
     print_hex(free_mem);
     print(" bytes\n");
 
-    print("Physical Memory Manager test complete.\n");
+    print("8. Physical Memory Manager test complete.\n");
 
+    print("9. Initializing file system...\n");
+    fs_init();
+    print("10. File system initialization complete.\n");
+
+    print("11. Initialization complete. Starting shell...\n");
+    shell_run();
+
+    // We should never reach here
+    print("12. Kernel main loop reached. This should not happen.\n");
     while(1) {
-        // Infinite loop to keep the kernel running
+        __asm__("wfi");  // Wait for interrupt
     }
 }

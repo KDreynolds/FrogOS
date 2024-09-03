@@ -1,5 +1,3 @@
-ENTRY(_start)
-
 SECTIONS
 {
     . = 0x40000000;
@@ -24,7 +22,9 @@ SECTIONS
     .bss :
     {
         *(.bss)
+        *(COMMON)
     }
+    . = ALIGN(4096);
     __bss_end = .;
     __end = .;
 }
