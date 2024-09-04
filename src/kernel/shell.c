@@ -77,6 +77,7 @@ static void shell_execute_command(const char* command) {
         print("  mkdir <path> - Create a new directory\n");
         print("  cd <path> - Change current directory\n");
         print("  pwd - Print current working directory\n");
+        print("  shutdown - Shut down the system\n");
     } else if (strcmp(cmd, "hello") == 0) {
         print("Hello from MyOS!\n");
     } else if (strcmp(cmd, "memory") == 0) {
@@ -101,6 +102,9 @@ static void shell_execute_command(const char* command) {
         cmd_cd(arg1);
     } else if (strcmp(cmd, "pwd") == 0) {
         cmd_pwd();
+    } else if (strcmp(cmd, "shutdown") == 0) {
+        print("Shutting down...\n");
+        system_shutdown();
     } else {
         print("Unknown command. Type 'help' for available commands.\n");
     }

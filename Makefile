@@ -15,6 +15,7 @@ SRCS = $(SRC_DIR)/boot/start.S \
        $(SRC_DIR)/kernel/shell.c \
        $(SRC_DIR)/kernel/fs.c \
        $(SRC_DIR)/drivers/uart.c \
+	   $(SRC_DIR)/kernel/io.c \
        $(SRC_DIR)/lib/string.c
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)

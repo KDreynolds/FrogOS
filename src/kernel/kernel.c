@@ -6,23 +6,23 @@
 #include "kernel/fs.h"
 
 
-// Function to print a string
-void print(const char* str) {
-    uart_puts(str);
-}
-
-void print_hex(uint64_t num) {
-    char hex_chars[] = "0123456789ABCDEF";
-    for (int i = 60; i >= 0; i -= 4) {
-        uart_putc(hex_chars[(num >> i) & 0xF]);
-    }
-}
-
 void delay(int count) {
     for (volatile int i = 0; i < count; i++) {
         for (volatile int j = 0; j < 10000; j++) {
             __asm__("nop");
         }
+    }
+}
+
+void kernel_shutdown(void) {
+    print("Shutting down...\n");
+    // Perform any necessary cleanup here
+
+    system_shutdown();
+
+    // If the above doesn't work (e.g., on real hardware), halt the CPU
+    while(1) {
+        __asm__ volatile("wfi");
     }
 }
 
