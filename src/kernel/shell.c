@@ -5,14 +5,24 @@
 #include "kernel/fs.h"
 #include <stddef.h>
 #include <stdint.h>
-#include "string.h"
+#include "string.h" 
 
 #define MAX_COMMAND_LENGTH 256
+#define MAX_PATH_LENGTH 256
 
 // Function prototypes
 static void shell_execute_command(const char* command);
 static int parse_args(const char* command, char* cmd, char* arg1, char* arg2);
 static int str_to_int(const char* str);
+
+// New function prototypes
+static void cmd_mkdir(const char* path);
+static void cmd_cd(const char* path);
+static void cmd_pwd(void);
+static void cmd_ls(const char* path);
+
+// Current working directory
+static char current_directory[MAX_PATH_LENGTH] = "/";
 
 void shell_run() {
     print("Shell: Entering shell loop\n");
@@ -20,7 +30,8 @@ void shell_run() {
     size_t command_length = 0;
 
     while (1) {
-        print("MyOS> ");
+        print(current_directory);
+        print("$ ");
         
         // Read command
         command_length = 0;
@@ -38,10 +49,6 @@ void shell_run() {
                 command[command_length++] = c;
             }
         }
-
-        print("Shell: Executing command: ");
-        print(command);
-        print("\n");
 
         // Execute command
         shell_execute_command(command);
@@ -66,7 +73,10 @@ static void shell_execute_command(const char* command) {
         print("  memory - Display memory information\n");
         print("  fs_create <filename> <size> - Create a new file\n");
         print("  fs_delete <filename> - Delete a file\n");
-        print("  fs_list - List all files\n");
+        print("  ls [path] - List contents of a directory\n");
+        print("  mkdir <path> - Create a new directory\n");
+        print("  cd <path> - Change current directory\n");
+        print("  pwd - Print current working directory\n");
     } else if (strcmp(cmd, "hello") == 0) {
         print("Hello from MyOS!\n");
     } else if (strcmp(cmd, "memory") == 0) {
@@ -76,18 +86,72 @@ static void shell_execute_command(const char* command) {
         print(" bytes\n");
     } else if (strcmp(cmd, "fs_create") == 0 && args == 3) {
         uint32_t size = str_to_int(arg2);
-        if (fs_create(arg1, size) == 0) {
+        if (fs_create(arg1, size, FS_FILE) == 0) {
             print("File created successfully\n");
         }
     } else if (strcmp(cmd, "fs_delete") == 0 && args == 2) {
         if (fs_delete(arg1) == 0) {
             print("File deleted successfully\n");
         }
-    } else if (strcmp(cmd, "fs_list") == 0) {
-        fs_list();
+    } else if (strcmp(cmd, "ls") == 0) {
+        cmd_ls(args == 2 ? arg1 : current_directory);
+    } else if (strcmp(cmd, "mkdir") == 0 && args == 2) {
+        cmd_mkdir(arg1);
+    } else if (strcmp(cmd, "cd") == 0 && args == 2) {
+        cmd_cd(arg1);
+    } else if (strcmp(cmd, "pwd") == 0) {
+        cmd_pwd();
     } else {
         print("Unknown command. Type 'help' for available commands.\n");
     }
+}
+
+static void cmd_mkdir(const char* path) {
+    char full_path[MAX_PATH_LENGTH];
+    if (path[0] == '/') {
+        strcpy(full_path, path);
+    } else {
+        strcpy(full_path, current_directory);
+        if (strcmp(current_directory, "/") != 0) {
+            strcat(full_path, "/");
+        }
+        strcat(full_path, path);
+    }
+
+    if (fs_create(full_path, 0, FS_DIRECTORY) == 0) {
+        print("Directory created successfully\n");
+    } else {
+        print("Failed to create directory\n");
+    }
+}
+
+static void cmd_cd(const char* path) {
+    char new_path[MAX_PATH_LENGTH];
+    if (path[0] == '/') {
+        strcpy(new_path, path);
+    } else {
+        strcpy(new_path, current_directory);
+        if (strcmp(current_directory, "/") != 0) {
+            strcat(new_path, "/");
+        }
+        strcat(new_path, path);
+    }
+
+    int entry = find_entry(new_path);
+    if (entry != -1 && find_entry(new_path) != -1) {
+        strcpy(current_directory, new_path);
+    } else {
+        print("Invalid directory\n");
+    }
+}
+
+static void cmd_pwd(void) {
+    print(current_directory);
+    print("\n");
+}
+
+static void cmd_ls(const char* path) {
+    fs_list(path);
 }
 
 static int parse_args(const char* command, char* cmd, char* arg1, char* arg2) {

@@ -31,3 +31,45 @@ void *memcpy(void *dest, const void *src, size_t n) {
         *d++ = *s++;
     return dest;
 }
+
+char *strcpy(char *dest, const char *src) {
+    char *d = dest;
+    while ((*d++ = *src++) != '\0');
+    return dest;
+}
+
+char *strcat(char *dest, const char *src) {
+    char *d = dest;
+    while (*d != '\0') d++;
+    while ((*d++ = *src++) != '\0');
+    return dest;
+}
+
+char *strchr(const char *s, int c) {
+    while (*s != '\0') {
+        if (*s == c) {
+            return (char *)s;
+        }
+        s++;
+    }
+    return NULL;
+}
+
+size_t strlen(const char *s) {
+    size_t len = 0;
+    while (*s != '\0') {
+        len++;
+        s++;
+    }
+    return len;
+}
+
+char *strrchr(const char *s, int c) {
+    const char *last = NULL;
+    do {
+        if (*s == c) {
+            last = s;
+        }
+    } while (*s++);
+    return (char *)last;
+}
